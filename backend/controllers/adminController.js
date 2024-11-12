@@ -84,11 +84,23 @@ exports.updateUser = (req, res) => {
     const { id } = req.params;
     const { first_name, last_name, email, phone } = req.body;
 
-    User.updateUser(id, [first_name, last_name, email, phone], (err) => {
-        if (err) 
-            
-            return res.status(500).json({ message: 'Error updating user', error: err});
+    // Check for missing fields in the request body
+    if (!first_name && !last_name && !email && !phone) {
+        return res.status(400).json({ message: 'At least one field is required to update' });
+    }
 
+    // Prepare userData object with fields from the request
+    const userData = {
+        firstName: first_name || null,
+        lastName: last_name || null,
+        email: email || null,
+        phone: phone || null
+    };
+
+    User.updateUser(id, userData, (err) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error updating user', error: err });
+        }
         res.json({ message: 'User updated successfully' });
     });
 };

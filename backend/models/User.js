@@ -45,14 +45,19 @@ class User {
     
 
     // Update User Details (User can update their own details)
-    static updateUser(userId, userData, callback) {
+   static updateUser(userId, userData, callback) {
         const { firstName, lastName, email, phone } = userData;
+
         const query = `
             UPDATE User 
-            SET first_name = ?, last_name = ?, email = ?, phone = ? 
+            SET 
+                first_name = COALESCE(?, first_name), 
+                last_name = COALESCE(?, last_name), 
+                email = COALESCE(?, email), 
+                phone = COALESCE(?, phone)
             WHERE id = ?
         `;
-        const values = [firstName, lastName, email, phone, userId];
+        const values = [firstName || null, lastName || null, email || null, phone || null, userId];
 
         db.query(query, values, (err, result) => {
             if (err) {
